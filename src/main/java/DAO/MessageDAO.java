@@ -13,17 +13,19 @@ public class MessageDAO {
     }
 
     public Message createMessage(int postedBy, String messageText, long timePosted) throws SQLException {
-        String sql = "INSERT INTO Message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Message (posted_by, message_text, time_posted_epoch) VALUES (?, ?, ?);";
+        
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, postedBy);
             stmt.setString(2, messageText);
             stmt.setLong(3, timePosted);
+            
             int affectedRows = stmt.executeUpdate();
-
+    
             if (affectedRows == 0) {
                 throw new SQLException("Creating message failed, no rows affected.");
             }
-
+    
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return new Message(generatedKeys.getInt(1), postedBy, messageText, timePosted);
@@ -33,7 +35,6 @@ public class MessageDAO {
             }
         }
     }
-
     public List<Message> getAllMessages() throws SQLException {
         List<Message> messages = new ArrayList<>();
         String sql = "SELECT * FROM Message";
