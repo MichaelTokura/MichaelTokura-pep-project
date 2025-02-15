@@ -50,9 +50,10 @@ public class Account {
     }
     /**
      * Properly named getters and setters are necessary for Jackson ObjectMapper to work. You may use them as well.
+     * @param postedBy 
      * @return account_id
      */
-    public int getAccount_id() {
+    public int getAccount_id(int postedBy) {
         return account_id;
     }
     /**

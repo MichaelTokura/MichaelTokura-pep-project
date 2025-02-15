@@ -19,17 +19,16 @@ public class AccountDAO {
             int affectedRows = stmt.executeUpdate();
 
             if (affectedRows == 0) {
-                throw new SQLException("Creating account failed, no rows affected.");
+                return null;
             }
 
             try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     return new Account(generatedKeys.getInt(1), username, password);
-                } else {
-                    throw new SQLException("Creating account failed, no ID obtained.");
                 }
             }
         }
+        return null;
     }
 
     public Account getAccountByUsername(String username) throws SQLException {
@@ -38,11 +37,7 @@ public class AccountDAO {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Account(
-                        rs.getInt("account_id"),
-                        rs.getString("username"),
-                        rs.getString("password")
-                    );
+                    return new Account(rs.getInt("account_id"), rs.getString("username"), rs.getString("password"));
                 }
             }
         }
@@ -55,15 +50,10 @@ public class AccountDAO {
             stmt.setInt(1, accountId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return new Account(
-                        rs.getInt("account_id"),
-                        rs.getString("username"),
-                        rs.getString("password")
-                    );
+                    return new Account(rs.getInt("account_id"), rs.getString("username"), rs.getString("password"));
                 }
             }
         }
         return null;
     }
 }
-
