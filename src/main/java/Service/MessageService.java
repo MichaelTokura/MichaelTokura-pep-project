@@ -39,7 +39,7 @@ public class MessageService {
         return messageDAO.getAllMessages();
     }
 
-    public Message updateMessage(Message message) throws SQLException {
+    public void updateMessage(Message message) throws SQLException {
         // Add validation/business logic before updating
          if (message.getMessage_text() == null || message.getMessage_text().isBlank() || message.getMessage_text().length() > 255) {
             throw new IllegalArgumentException("Message text cannot be blank and must be under 255 characters.");
@@ -51,6 +51,5 @@ public class MessageService {
         messageDAO.deleteMessage(message_id);
     }
 
-    // Example of a more complex business logic operation (if needed)
-    // public List<Message> getMessagesByUserAndDateRange(int userId, long startTime, long endTime) throws SQLException { ... }
+    
 }
