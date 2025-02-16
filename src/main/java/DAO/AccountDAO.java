@@ -1,137 +1,255 @@
 package DAO;
 
 import Model.Account;
-import java.sql.*;
+import Util.ConnectionUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
-/**
- * This class interacts with the Accounts table in the database.
- */
-public class AccountDAO {
+// Created a DAO classes for each table in the SocialMedia.sql database (Account, Message).
+// This class implements the CRUD (Create, Retrieve, Update, Delete) operations for the Account table in the database.
+// Each method creates a PreparedStatement object using the try-with-resources, which helps prevent
+// resource leaks.
 
-    private Connection connection;
+public class AccountDAO implements BaseDao<Account> {
 
-    public AccountDAO(Connection connection) {
-        this.connection = connection;
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountDAO.class);
 
-    /**
-     * Retrieves an Account from the database by username.
-     * @param username The username of the account to retrieve.
-     * @return The Account object, or null if not found.
-     * @throws SQLException If a database error occurs.
-     */
-    public Account getAccountByUsername(String username) throws SQLException {
-        String sql = "SELECT * FROM account WHERE username = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, username);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return extractAccountFromResultSet(resultSet);
-                }
-            }
-        }
-        return null;
+    // Helper method to handle SQLException
+    private void handleSQLException(SQLException e, String sql, String errorMessage) {
+        LOGGER.error("SQLException Details: {}", e.getMessage());
+        LOGGER.error("SQL State: {}", e.getSQLState());
+        LOGGER.error("Error Code: {}", e.getErrorCode());
+        LOGGER.error("SQL: {}", sql);
+        throw new DaoException(errorMessage, e);
     }
 
 
-    /**
-     * Retrieves an Account from the database by ID.
-     * @param account_id The ID of the account to retrieve.
-     * @return The Account object, or null if not found.
-     * @throws SQLException If a database error occurs.
-     */
-    public Account getAccountById(int account_id) throws SQLException {
+
+
+
+
+
+    @Override
+    public Optional<Account> getById(int id) {
+
         String sql = "SELECT * FROM account WHERE account_id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, account_id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return extractAccountFromResultSet(resultSet);
+        Connection conn = ConnectionUtil.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            // ResultSet is in a separate try block to ensure it gets closed after use,
+            // even if an exception is thrown during data processing.
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(new Account(
+                            rs.getInt("account_id"),
+                            rs.getString("username"),
+                            rs.getString("password")));
                 }
             }
+        } catch (SQLException e) {
+            handleSQLException(e, sql, "Error while retrieving the account with id: " + id);
         }
-        return null;
+        return Optional.empty();
     }
 
 
-    /**
-     * Retrieves all Accounts from the database.
-     * @return A list of all Account objects.
-     * @throws SQLException If a database error occurs.
-     */
-    public List<Account> getAllAccounts() throws SQLException {
+    @Override
+    public List<Account> getAll() {
         List<Account> accounts = new ArrayList<>();
         String sql = "SELECT * FROM account";
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
-            while (resultSet.next()) {
-                accounts.add(extractAccountFromResultSet(resultSet));
+        Connection conn = ConnectionUtil.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Account account = new Account(
+                            rs.getInt("account_id"),
+                            rs.getString("username"),
+                            rs.getString("password"));
+                    accounts.add(account);
+                }
             }
+        } catch (SQLException e) {
+            handleSQLException(e, sql, "Error while retrieving all the accounts");
         }
         return accounts;
     }
 
     /**
-     * Adds a new Account to the database.  The account_id is generated by the database.
-     * @param account The Account object to add.
-     * @return The newly created Account object (now with the generated ID), or null if the insert failed.
-     * @throws SQLException If a database error occurs.
+     * Retrieves an account from the database based on its username.
+     *
+     * @param username The username of the account.
+     * @return An Optional object, which will contain the account if it was found,
+     *         otherwise it will be empty.
      */
-    public Account addAccount(Account account) throws SQLException {
-        String sql = "INSERT INTO account (username, password) VALUES (?, ?);";
-        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, account.getUsername());
-            statement.setString(2, account.getPassword());
-            int affectedRows = statement.executeUpdate();
-            if (affectedRows > 0) {
-                try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        int generatedId = generatedKeys.getInt(1);
-                        account.setAccount_id(generatedId); // Set the ID generated by the database
-                        return account;
+    public Optional<Account> findAccountByUsername(String username) {
+
+        String sql = "SELECT * FROM account WHERE username = ?";
+        Connection conn = ConnectionUtil.getConnection();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(new Account(
+                            rs.getInt("account_id"),
+                            rs.getString("username"),
+                            rs.getString("password")));
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, sql, "Error while finding account with username: " + username);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Validates the login credentials by checking if the provided username and
+     * password match an account in the database.
+     *
+     * @param username The username of the account.
+     * @param password The password of the account.
+     * @return An Optional object, which will contain the account if the login was
+     *         successful, otherwise it will be empty.
+     */
+    public Optional<Account> validateLogin(String username, String password) {
+        String sql = "SELECT * FROM account WHERE username = ?";
+        Connection conn = ConnectionUtil.getConnection();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Account account = new Account(
+                            rs.getInt("account_id"),
+                            rs.getString("username"),
+                            rs.getString("password"));
+
+                    // Compare the provided password with the stored password in the Account object
+                    if (Objects.equals(password, account.getPassword())) {
+                        // Return an Optional containing the authenticated Account
+                        return Optional.of(account);
                     }
                 }
             }
+        } catch (SQLException e) {
+            handleSQLException(e, sql, "Error while validating login for username: " + username);
         }
-        return null; // Insert failed
+        return Optional.empty();
+    }
+
+    /**
+     * Checks if a username already exists in the database.
+     *
+     * @param username The username to check.
+     * @return true if the username already exists in the database; false otherwise.
+     */
+    public boolean doesUsernameExist(String username) {
+        String sql = "SELECT COUNT(*) FROM account WHERE username = ?";
+        Connection conn = ConnectionUtil.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, username);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            } catch (SQLException e) {
+                handleSQLException(e, sql, "Error while checking if username exists: " + username);
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, sql, "Error while establishing connection");
+        }
+        return false;
+    }
+
+    /**
+     * Inserts a new account into the database.
+     *
+     * @param account The account object to insert.
+     * @return The account object that was inserted, including its generated ID.
+     * @throws DaoException if an error occurs during the insertion.
+     */
+    @Override
+    public Account insert(Account account) {
+        String sql = "INSERT INTO account (username, password) VALUES (?, ?)";
+        Connection conn = ConnectionUtil.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, account.getUsername());
+            ps.setString(2, account.getPassword());
+            ps.executeUpdate();
+
+            // Retrieve the generated keys (auto-generated ID)
+            try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    int generatedAccountId = generatedKeys.getInt(1);
+                    return new Account(generatedAccountId, account.getUsername(), account.getPassword());
+                } else {
+                    throw new DaoException("Creating account failed, no ID obtained.");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DaoException("Creating account failed due to SQL error", e);
+        }
     }
 
 
 
+
+
+
     /**
-     * Updates an existing Account in the database.
-     * @param account The Account object to update.
-     * @throws SQLException If a database error occurs.
+     * Updates an existing account in the database.
+     *
+     * @param account The account object to update.
+     * @return true if the update was successful; false otherwise.
+     * @throws DaoException if an error occurs during the update.
      */
-    public void updateAccount(Account account) throws SQLException {
+    @Override
+    public boolean update(Account account, int postedBy) {
         String sql = "UPDATE account SET username = ?, password = ? WHERE account_id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, account.getUsername());
-            statement.setString(2, account.getPassword());
-            statement.setInt(3, account.getAccount_id(0)); // Get account ID
-            statement.executeUpdate();
+        Connection conn = ConnectionUtil.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, account.getUsername());
+            ps.setString(2, account.getPassword());
+            ps.setInt(3, account.getAccount_id(postedBy));
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                return true;
+            } else {
+                throw new DaoException("Updating account failed, no such account found.");
+            }
+        } catch (SQLException e) {
+            throw new DaoException("Updating account failed due to SQL error", e);
         }
     }
 
     /**
-     * Deletes an Account from the database.
-     * @param account_id The ID of the account to delete.
-     * @throws SQLException If a database error occurs.
+     * Deletes an account from the database.
+     *
+     * @param account The account object to delete.
+     * @return true if the delete was successful; false otherwise.
+     * @throws DaoException if an error occurs during the deletion.
      */
-    public void deleteAccount(int account_id) throws SQLException {
+    @Override
+    public boolean delete(Account account, int postedBy) {
         String sql = "DELETE FROM account WHERE account_id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, account_id);
-            statement.executeUpdate();
+        Connection conn = ConnectionUtil.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, account.getAccount_id(postedBy));
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            throw new DaoException("Deleting account failed due to SQL error", e);
         }
-    }
-
-    private Account extractAccountFromResultSet(ResultSet resultSet) throws SQLException {
-        int accountId = resultSet.getInt("account_id");
-        String username = resultSet.getString("username");
-        String password = resultSet.getString("password");
-        return new Account(accountId, username, password);
     }
 }
