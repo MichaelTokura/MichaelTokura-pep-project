@@ -17,19 +17,19 @@ import io.javalin.http.NotFoundResponse;
  */
 
 public class MessageService {
-    private MessageDAO messageDAO;
+    private MessageDAO messageDao;
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageService.class);
     private static final String DB_ACCESS_ERROR_MSG = "Error accessing the database";
 
     // Default constructor initializing the MessageDao object
     public MessageService() {
-        messageDAO = new MessageDAO();
+        messageDao = new MessageDAO();
     }
 
     // Constructor that allows an external MessageDao to be used, useful for testing
     // purposes.
     public MessageService(MessageDAO messageDao) {
-        this.messageDAO = messageDao;
+        this.messageDao = messageDao;
     }
 
     /**
@@ -43,7 +43,7 @@ public class MessageService {
     public Optional<Message> getMessageById(int id) {
         LOGGER.info("Fetching message with ID: {} ", id);
         try {
-            Optional<Message> message = messageDAO.getById(id);
+            Optional<Message> message = messageDao.getById(id);
             if (!message.isPresent()) {
                 throw new ExceptionService("Message not found");
             }
@@ -63,7 +63,7 @@ public class MessageService {
     public List<Message> getAllMessages() {
         LOGGER.info("Fetching all messages");
         try {
-            List<Message> messages = messageDAO.getAll();
+            List<Message> messages = messageDao.getAll();
             LOGGER.info("Fetched {} messages", messages.size());
             return messages;
         } catch (DaoException e) {
@@ -81,7 +81,7 @@ public class MessageService {
     public List<Message> getMessagesByAccountId(int accountId) {
         LOGGER.info("Fetching messages posted by ID account: {}", accountId);
         try {
-            List<Message> messages = messageDAO.getMessagesByAccountId(accountId);
+            List<Message> messages = messageDao.getMessagesByAccountId(accountId);
             LOGGER.info("Fetched {} messages", messages.size());
             return messages;
         } catch (DaoException e) {
@@ -115,7 +115,7 @@ public class MessageService {
         checkAccountPermission(account.get(), message.getPosted_by());
         try {
             // Insert the message into the database
-            Message createdMessage = messageDAO.insert(message);
+            Message createdMessage = messageDao.insert(message);
             LOGGER.info("Created message: {}", createdMessage);
             return createdMessage;
         } catch (DaoException e) {
@@ -152,7 +152,7 @@ public class MessageService {
 
         try {
             // Update the message in the database
-            messageDAO.update(retrievedMessage.get(), 0);
+            messageDao.update(retrievedMessage.get());
             LOGGER.info("Updated message: {}", message);
             return retrievedMessage.get();
         } catch (DaoException e) {
@@ -169,10 +169,10 @@ public class MessageService {
      * @throws ServiceException If the Message does not exist or there is a DAO
      *                          exception
      */
-    public void deleteMessage(Message message, int postedBy) {
+    public void deleteMessage(Message message) {
         LOGGER.info("Deleting message: {}", message);
         try {
-            boolean hasDeletedMessage = messageDAO.delete(message, postedBy);
+            boolean hasDeletedMessage = messageDao.delete(message);
             if (hasDeletedMessage) {
                 LOGGER.info("Deleted message {}", message);
             } else {
@@ -212,7 +212,7 @@ public class MessageService {
      */
     private void checkAccountPermission(Account account, int postedBy) {
         LOGGER.info("Checking account permissions for messages");
-        if (account.getAccount_id(postedBy) != postedBy) {
+        if (account.getAccount_id() != postedBy) {
             throw new ExceptionService("Account not authorized to modify this message");
         }
     }

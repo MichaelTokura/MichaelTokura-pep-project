@@ -142,11 +142,11 @@ public class AccountService {
      * @return true if the update was successful, false otherwise.
      * @throws ServiceException If any exception occurs during updating.
      */
-    public boolean updateAccount(Account account, int postedBy) {
+    public boolean updateAccount(Account account) {
         LOGGER.info("Updating account: {}", account);
         try {
             account.setPassword(account.password);
-            boolean updated = accountDao.update(account, postedBy);
+            boolean updated = accountDao.update(account);
             LOGGER.info("Updated account: {}. Update successful {}", account, updated);
             return updated;
         } catch (DaoException e) {
@@ -161,13 +161,13 @@ public class AccountService {
      * @return true if the deletion was successful, false otherwise.
      * @throws ServiceException If any exception occurs during deletion.
      */
-    public boolean deleteAccount(Account account, int postedBy) {
+    public boolean deleteAccount(Account account) {
         LOGGER.info("Deleting account: {}", account);
-        if (account.getAccount_id(postedBy) == 0) {
+        if (account.getAccount_id() == 0) {
             throw new IllegalArgumentException("Account ID cannot be null");
         }
         try {
-            boolean deleted = accountDao.delete(account, postedBy);
+            boolean deleted = accountDao.delete(account);
             LOGGER.info("Deleted account: {} . Deletion successful {}", account, deleted);
             return deleted;
         } catch (DaoException e) {

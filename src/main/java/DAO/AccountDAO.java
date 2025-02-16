@@ -206,6 +206,29 @@ public class AccountDAO implements BaseDao<Account> {
 
 
 
+    public int getAccount_id(int postedBy) {
+        String sql = "SELECT account_id FROM account WHERE account_id = ?";
+        Connection conn = ConnectionUtil.getConnection();
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, postedBy);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("account_id");
+                }
+            }
+        } catch (SQLException e) {
+            handleSQLException(e, sql, "Error while retrieving account_id for postedBy: " + postedBy);
+        }
+        
+        return -1; // Return -1 if no account is found (or consider throwing an exception)
+    }
+
+
+
+
+
+
 
     /**
      * Updates an existing account in the database.
@@ -215,13 +238,13 @@ public class AccountDAO implements BaseDao<Account> {
      * @throws DaoException if an error occurs during the update.
      */
     @Override
-    public boolean update(Account account, int postedBy) {
+    public boolean update(Account account) {
         String sql = "UPDATE account SET username = ?, password = ? WHERE account_id = ?";
         Connection conn = ConnectionUtil.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, account.getUsername());
             ps.setString(2, account.getPassword());
-            ps.setInt(3, account.getAccount_id(postedBy));
+            ps.setInt(3, account.getAccount_id());
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
                 return true;
@@ -241,11 +264,11 @@ public class AccountDAO implements BaseDao<Account> {
      * @throws DaoException if an error occurs during the deletion.
      */
     @Override
-    public boolean delete(Account account, int postedBy) {
+    public boolean delete(Account account) {
         String sql = "DELETE FROM account WHERE account_id = ?";
         Connection conn = ConnectionUtil.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, account.getAccount_id(postedBy));
+            ps.setInt(1, account.getAccount_id());
             int affectedRows = ps.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {

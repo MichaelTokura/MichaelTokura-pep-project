@@ -57,7 +57,7 @@ public interface BaseDao<T> {
      * @return true if the update was successful; false if the object was not found
      *         in the database.
      */
-    boolean update(T t, int x);
+    boolean update(T t);
 
     /**
      * Deletes an object from the system.
@@ -66,5 +66,5 @@ public interface BaseDao<T> {
      * @return true if the deletion was successful; false if the object was not
      *         found in the database.
      */
-    boolean delete(T t, int y);
+    boolean delete(T t);
 }

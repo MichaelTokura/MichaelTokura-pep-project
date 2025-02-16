@@ -179,7 +179,7 @@ public class MessageDAO implements BaseDao<Message> {
      *         in the database.
      */
     @Override
-    public boolean update(Message message, int posted_by) {
+    public boolean update(Message message) {
         String sql = "UPDATE message SET posted_by = ?, message_text = ?, time_posted_epoch = ? WHERE message_id = ?";
         int rowsUpdated = 0;
         Connection conn = ConnectionUtil.getConnection();
@@ -203,7 +203,7 @@ public class MessageDAO implements BaseDao<Message> {
      *         found in the database.
      */
     @Override
-    public boolean delete(Message message, int postedBy) {
+    public boolean delete(Message message) {
         String sql = "DELETE FROM message WHERE message_id = ?";
         int rowsUpdated = 0;
         Connection conn = ConnectionUtil.getConnection();
