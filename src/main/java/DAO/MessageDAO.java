@@ -22,7 +22,7 @@ import Util.ConnectionUtil;
  * messages.
  */
 
-public class MessageDAO implements BaseDao<Message> {
+public class MessageDAO implements MAINDAO<Message> {
 
     // Create a Logger instance for this class.
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageDAO.class);
@@ -41,7 +41,7 @@ public class MessageDAO implements BaseDao<Message> {
         LOGGER.error("SQL State: {}", e.getSQLState());
         LOGGER.error("Error Code: {}", e.getErrorCode());
         LOGGER.error("SQL: {}", sql);
-        throw new DaoException(errorMessage, e);
+        throw new ExceptionDAO(errorMessage, e);
     }
 
     /**
@@ -162,13 +162,13 @@ public class MessageDAO implements BaseDao<Message> {
                     return new Message(generatedId, message.getPosted_by(), message.getMessage_text(),
                             message.getTime_posted_epoch());
                 } else {
-                    throw new DaoException("Failed to insert message, no ID obtained.");
+                    throw new ExceptionDAO("Failed to insert message, no ID obtained.");
                 }
             }
         } catch (SQLException e) {
             handleSQLException(e, sql, "Error while inserting a message");
         }
-        throw new DaoException("Failed to insert message");
+        throw new ExceptionDAO("Failed to insert message");
     }
 
     /**

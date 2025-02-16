@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import DAO.AccountDAO;
-import DAO.DaoException;
+import DAO.ExceptionDAO;
 import Model.Account;
 
 /*
@@ -52,7 +52,7 @@ public class AccountService {
             Optional<Account> account = accountDao.getById(id);
             LOGGER.info("Fetched account: {}", account.orElse(null));
             return account;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while fetching account", e);
         }
     }
@@ -70,7 +70,7 @@ public class AccountService {
             List<Account> accounts = accountDao.getAll();
             LOGGER.info("Fetched {} accounts", accounts.size());
             return accounts;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while fetching accounts", e);
         }
     }
@@ -88,7 +88,7 @@ public class AccountService {
             Optional<Account> account = accountDao.findAccountByUsername(username);
             LOGGER.info("Found account: {}", account.orElse(null));
             return account;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while finding account by username " + username, e);
         }
     }
@@ -107,7 +107,7 @@ public class AccountService {
                     account.getPassword());
             LOGGER.info("Login validation result: {}", validatedAccount.isPresent());
             return validatedAccount;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while validating login", e);
         }
     }
@@ -130,7 +130,7 @@ public class AccountService {
             Account createdAccount = accountDao.insert(account);
             LOGGER.info("Created account: {}", createdAccount);
             return createdAccount;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while creating account", e);
         }
     }
@@ -149,7 +149,7 @@ public class AccountService {
             boolean updated = accountDao.update(account);
             LOGGER.info("Updated account: {}. Update successful {}", account, updated);
             return updated;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while while updating account", e);
         }
     }
@@ -170,7 +170,7 @@ public class AccountService {
             boolean deleted = accountDao.delete(account);
             LOGGER.info("Deleted account: {} . Deletion successful {}", account, deleted);
             return deleted;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while while deleting account", e);
         }
     }
@@ -202,7 +202,7 @@ public class AccountService {
             if (accountDao.doesUsernameExist(account.getUsername())) {
                 throw new ExceptionService("The username must be unique");
             }
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while validating account", e);
         }
     }
@@ -221,7 +221,7 @@ public class AccountService {
             boolean exists = account.isPresent();
             LOGGER.info("Account existence: {}", exists);
             return exists;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while checking account existence", e);
         }
     }

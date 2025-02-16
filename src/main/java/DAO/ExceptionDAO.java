@@ -7,7 +7,7 @@ package DAO;
  * which does not have to be declared in method signatures
  * or explicitly caught in the code.
  */
-public class DaoException extends RuntimeException {
+public class ExceptionDAO extends RuntimeException {
 
     /**
      * Serialization in Java is the process of converting an object into a byte
@@ -35,7 +35,7 @@ public class DaoException extends RuntimeException {
      * @param message The detailed message for the exception. This is saved for
      *                later retrieval by the getMessage() method.
      */
-    public DaoException(String message) {
+    public ExceptionDAO(String message) {
         super(message);
     }
 
@@ -52,7 +52,7 @@ public class DaoException extends RuntimeException {
      *                nonexistent or
      *                unknown.
      */
-    public DaoException(String message, Throwable cause) {
+    public ExceptionDAO(String message, Throwable cause) {
         super(message, cause);
     }
 }

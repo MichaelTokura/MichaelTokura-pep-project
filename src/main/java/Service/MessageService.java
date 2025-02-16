@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import DAO.MessageDAO;
-import DAO.DaoException;
+import DAO.ExceptionDAO;
 import Model.Account;
 import Model.Message;
 import io.javalin.http.NotFoundResponse;
@@ -49,7 +49,7 @@ public class MessageService {
             }
             LOGGER.info("Fetched message: {}", message.orElse(null));
             return message;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
         }
     }
@@ -66,7 +66,7 @@ public class MessageService {
             List<Message> messages = messageDao.getAll();
             LOGGER.info("Fetched {} messages", messages.size());
             return messages;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
         }
     }
@@ -84,7 +84,7 @@ public class MessageService {
             List<Message> messages = messageDao.getMessagesByAccountId(accountId);
             LOGGER.info("Fetched {} messages", messages.size());
             return messages;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
         }
     }
@@ -118,7 +118,7 @@ public class MessageService {
             Message createdMessage = messageDao.insert(message);
             LOGGER.info("Created message: {}", createdMessage);
             return createdMessage;
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
         }
     }
@@ -155,7 +155,7 @@ public class MessageService {
             messageDao.update(retrievedMessage.get());
             LOGGER.info("Updated message: {}", message);
             return retrievedMessage.get();
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
         }
     }
@@ -178,7 +178,7 @@ public class MessageService {
             } else {
                 throw new NotFoundResponse("Message to delete not found");
             }
-        } catch (DaoException e) {
+        } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
         }
     }

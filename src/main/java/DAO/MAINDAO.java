@@ -10,7 +10,7 @@ import java.util.Optional;
  * implementing this interface.
  */
 
-public interface BaseDao<T> {
+public interface MAINDAO<T> {
 
     /*
      * Optional is used in the get method to handle the possibility that an account

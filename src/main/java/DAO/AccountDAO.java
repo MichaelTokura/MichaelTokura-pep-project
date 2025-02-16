@@ -21,7 +21,7 @@ import java.util.Optional;
 // Each method creates a PreparedStatement object using the try-with-resources, which helps prevent
 // resource leaks.
 
-public class AccountDAO implements BaseDao<Account> {
+public class AccountDAO implements MAINDAO<Account> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountDAO.class);
 
@@ -31,7 +31,7 @@ public class AccountDAO implements BaseDao<Account> {
         LOGGER.error("SQL State: {}", e.getSQLState());
         LOGGER.error("Error Code: {}", e.getErrorCode());
         LOGGER.error("SQL: {}", sql);
-        throw new DaoException(errorMessage, e);
+        throw new ExceptionDAO(errorMessage, e);
     }
 
 
@@ -194,11 +194,11 @@ public class AccountDAO implements BaseDao<Account> {
                     int generatedAccountId = generatedKeys.getInt(1);
                     return new Account(generatedAccountId, account.getUsername(), account.getPassword());
                 } else {
-                    throw new DaoException("Creating account failed, no ID obtained.");
+                    throw new ExceptionDAO("Creating account failed, no ID obtained.");
                 }
             }
         } catch (SQLException e) {
-            throw new DaoException("Creating account failed due to SQL error", e);
+            throw new ExceptionDAO("Creating account failed due to SQL error", e);
         }
     }
 
@@ -226,10 +226,10 @@ public class AccountDAO implements BaseDao<Account> {
             if (affectedRows > 0) {
                 return true;
             } else {
-                throw new DaoException("Updating account failed, no such account found.");
+                throw new ExceptionDAO("Updating account failed, no such account found.");
             }
         } catch (SQLException e) {
-            throw new DaoException("Updating account failed due to SQL error", e);
+            throw new ExceptionDAO("Updating account failed due to SQL error", e);
         }
     }
 
@@ -249,7 +249,7 @@ public class AccountDAO implements BaseDao<Account> {
             int affectedRows = ps.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
-            throw new DaoException("Deleting account failed due to SQL error", e);
+            throw new ExceptionDAO("Deleting account failed due to SQL error", e);
         }
     }
 }
