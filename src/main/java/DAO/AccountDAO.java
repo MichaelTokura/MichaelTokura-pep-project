@@ -206,29 +206,6 @@ public class AccountDAO implements BaseDao<Account> {
 
 
 
-    public int getAccount_id(int postedBy) {
-        String sql = "SELECT account_id FROM account WHERE account_id = ?";
-        Connection conn = ConnectionUtil.getConnection();
-        
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, postedBy);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("account_id");
-                }
-            }
-        } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while retrieving account_id for postedBy: " + postedBy);
-        }
-        
-        return -1; // Return -1 if no account is found (or consider throwing an exception)
-    }
-
-
-
-
-
-
 
     /**
      * Updates an existing account in the database.
