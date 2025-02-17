@@ -71,18 +71,14 @@ public class MessageService {
     public Message createMessage(Message message, Optional<Account> account) {
         LOGGER.info("Creating message: {}", message);
 
-        // Ensure that the account exists
         if (!account.isPresent()) {
             throw new ExceptionService("Unable to post message without an account");
         }
 
-        // Validate the message
         validateMessage(message);
 
-        // Check account permission
         checkAccountPermission(account.get(), message.getPosted_by());
         try {
-            // Insert the message into the database
             Message createdMessage = messageDao.insert(message);
             LOGGER.info("Message successfully created: {}", createdMessage);
             return createdMessage;

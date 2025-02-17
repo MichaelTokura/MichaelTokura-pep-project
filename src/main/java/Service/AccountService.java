@@ -36,7 +36,7 @@ public class AccountService {
             LOGGER.info("Fetched account: {}", account.orElse(null));
             return account;
         } catch (ExceptionDAO e) {
-            throw new ExceptionService("Exception occurred while fetching account", e);
+            throw new ExceptionService("Exception occurred while attempting to retrieve account", e);
         }
     }
 
@@ -49,7 +49,7 @@ public class AccountService {
             LOGGER.info("Fetched {} accounts", accounts.size());
             return accounts;
         } catch (ExceptionDAO e) {
-            throw new ExceptionService("Exception occurred while fetching accounts", e);
+            throw new ExceptionService("Exception occurred while attempting to retrieve accounts", e);
         }
     }
 
@@ -135,14 +135,14 @@ public class AccountService {
                 throw new ExceptionService("Username cannot be blank");
             }
             if (password.isEmpty()) {
-                throw new ExceptionService("Password cannot be empty");
+                throw new ExceptionService("Password cannot be null");
             }
 
             if (password.length() < 4) {
                 throw new ExceptionService("Password must be at least 4 characters long");
             }
             if (accountDao.doesUsernameExist(account.getUsername())) {
-                throw new ExceptionService("The username must be unique");
+                throw new ExceptionService("The username must have unique values");
             }
         } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while validating account", e);
