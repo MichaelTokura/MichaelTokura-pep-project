@@ -14,7 +14,7 @@ import Service.ExceptionService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
-public class SocialMediaController {
+public class SocialMediaController { 
 
     private final AccountService accountService;
     private final MessageService messageService;
