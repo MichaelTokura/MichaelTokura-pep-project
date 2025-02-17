@@ -10,42 +10,25 @@ import DAO.AccountDAO;
 import DAO.ExceptionDAO;
 import Model.Account;
 
-/*
-    The AccountService class contains business logic for account operations, focusing on business logic validations.
-    It interacts with the AccountDao class to perform CRUD operations on accounts.
 
-    The LOGGER object is used for logging various messages associated with account operations, such as fetching, updating,
-    creating, and deleting accounts. In this context, exceptions thrown during business logic validations are expected and
-    not indicative of system failures. Therefore, the use of LOGGER.error() or LOGGER.warn() in the catch blocks for logging
-    is avoided to prevent redundancy and potential confusion.
- */
 
 public class AccountService {
     private AccountDAO accountDao;
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountService.class);
 
-    // Default constructor initializing the AccountDao object
     public AccountService() {
         accountDao = new AccountDAO();
     }
 
-    /**
-     * Constructor that allows an external AccountDao to be used, useful for testing
-     * purposes.
-     *
-     * @param accountDao The DAO instance to use.
-     */
+   
     public AccountService(AccountDAO accountDAO) {
         this.accountDao = accountDao;
     }
 
-    /**
-     * Retrieves an Account by its ID using the AccountDao.
-     *
-     * @param id The ID of the account to fetch.
-     * @return Optional containing the fetched account if it exists.
-     * @throws ServiceException If any exception occurs during fetching.
-     */
+    
+
+
+     
     public Optional<Account> getAccountById(int id) {
         LOGGER.info("Fetching account with ID: {}", id);
         try {
@@ -57,12 +40,7 @@ public class AccountService {
         }
     }
 
-    /**
-     * Retrieves all accounts using the AccountDao.
-     *
-     * @return List of all accounts.
-     * @throws ServiceException If any exception occurs during fetching.
-     */
+   
 
     public List<Account> getAllAccounts() {
         LOGGER.info("Fetching all accounts");
@@ -75,13 +53,7 @@ public class AccountService {
         }
     }
 
-    /**
-     * Finds an account by username using the AccountDao.
-     *
-     * @param username The username of the account to find.
-     * @return Optional containing the found account if it exists.
-     * @throws ServiceException If any exception occurs during finding.
-     */
+   
     public Optional<Account> findAccountByUsername(String username) {
         LOGGER.info("Finding account by username: {}", username);
         try {
@@ -93,13 +65,7 @@ public class AccountService {
         }
     }
 
-    /**
-     * Validate login using the AccountDao.
-     *
-     * @param account The account to validate.
-     * @return Optional containing the validated account if it exists.
-     * @throws ServiceException If any exception occurs during validation.
-     */
+    
     public Optional<Account> validateLogin(Account account) {
         LOGGER.info("Validating login");
         try {
@@ -112,13 +78,7 @@ public class AccountService {
         }
     }
 
-    /**
-     * Insert a new account into the database using the AccountDao.
-     *
-     * @param account The account to create.
-     * @return The created account.
-     * @throws ServiceException If any exception occurs during creation.
-     */
+    
     public Account createAccount(Account account) {
         LOGGER.info("Creating account: {}", account);
         try {
@@ -135,13 +95,7 @@ public class AccountService {
         }
     }
 
-    /**
-     * Updates an existing account in the database using the AccountDao.
-     *
-     * @param account The account to update.
-     * @return true if the update was successful, false otherwise.
-     * @throws ServiceException If any exception occurs during updating.
-     */
+    
     public boolean updateAccount(Account account) {
         LOGGER.info("Updating account: {}", account);
         try {
@@ -154,13 +108,7 @@ public class AccountService {
         }
     }
 
-    /**
-     * Deletes an existing account from the database.
-     *
-     * @param account The account to delete.
-     * @return true if the deletion was successful, false otherwise.
-     * @throws ServiceException If any exception occurs during deletion.
-     */
+    
     public boolean deleteAccount(Account account) {
         LOGGER.info("Deleting account: {}", account);
         if (account.getAccount_id() == 0) {
@@ -175,13 +123,7 @@ public class AccountService {
         }
     }
 
-    /**
-     * Validates the given account based on business rules.
-     *
-     * @param account The account to validate.
-     * @throws ServiceException If the account does not meet the validation
-     *                          criteria.
-     */
+
     private void validateAccount(Account account) {
         LOGGER.info("Validating account: {}", account);
         try {
@@ -207,13 +149,7 @@ public class AccountService {
         }
     }
 
-    /**
-     * Checks if the user exists in the database based on their id.
-     *
-     * @param accountId The id of the account to check.
-     * @return true if the account exists, false otherwise.
-     * @throws ServiceException If any exception occurs during checking.
-     */
+
     public boolean accountExists(int accountId) {
         LOGGER.info("Checking account existence with ID: {}", accountId);
         try {

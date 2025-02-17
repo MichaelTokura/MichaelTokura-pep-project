@@ -53,7 +53,7 @@ public class Account {
      * @param postedBy 
      * @return account_id
      */
-    public int getAccount_id(int postedBy) {
+    public int getAccount_id() {
         return account_id;
     }
     /**
