@@ -45,7 +45,7 @@ public class MessageDAO implements MAINDAO<Message> {
                 }
             }
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while retrieving the message with id: " + id);
+            handleSQLException(e, sql, "Error: Unable to retrieve message with id: " + id);
         }
         return Optional.empty();
     }
@@ -63,7 +63,7 @@ public class MessageDAO implements MAINDAO<Message> {
                 }
             }
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while retrieving all messages");
+            handleSQLException(e, sql, "Error: Unable to retrieve all messages");
         }
         return messages;
     }
@@ -78,7 +78,7 @@ public class MessageDAO implements MAINDAO<Message> {
                 return mapResultSetToList(rs);
             }
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while retrieving a message by account ID: " + accountId);
+            handleSQLException(e, sql, "Error: Unable to retrieve message by account ID: " + accountId);
         }
         return new ArrayList<>();
     }
@@ -110,11 +110,11 @@ public class MessageDAO implements MAINDAO<Message> {
                     return new Message(generatedId, message.getPosted_by(), message.getMessage_text(),
                             message.getTime_posted_epoch());
                 } else {
-                    throw new ExceptionDAO("Failed to insert message, no ID obtained.");
+                    throw new ExceptionDAO("Unable to insert message, no ID obtained.");
                 }
             }
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while inserting a message");
+            handleSQLException(e, sql, "Error: Unable to insert message");
         }
         throw new ExceptionDAO("Failed to insert message");
     }
@@ -132,7 +132,7 @@ public class MessageDAO implements MAINDAO<Message> {
             ps.setInt(4, message.getMessage_id());
             rowsUpdated = ps.executeUpdate();
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while updating the message with id: " + message.getMessage_id());
+            handleSQLException(e, sql, "Error : Unable to update the message with id: " + message.getMessage_id());
         }
         return rowsUpdated > 0;
     }
@@ -147,7 +147,7 @@ public class MessageDAO implements MAINDAO<Message> {
             ps.setInt(1, message.getMessage_id());
             rowsUpdated = ps.executeUpdate();
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while deleting the message with id: " + message.getMessage_id());
+            handleSQLException(e, sql, "Error: Unable to delete message with id: " + message.getMessage_id());
         }
         return rowsUpdated > 0;
     }

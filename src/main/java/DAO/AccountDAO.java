@@ -53,7 +53,7 @@ public class AccountDAO implements MAINDAO<Account> {
                 }
             }
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while retrieving the account with id: " + id);
+            handleSQLException(e, sql, "Error: unable to retrieve account with id: " + id);
         }
         return Optional.empty();
     }
@@ -75,7 +75,7 @@ public class AccountDAO implements MAINDAO<Account> {
                 }
             }
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while retrieving all the accounts");
+            handleSQLException(e, sql, "Error: unable to retrieve all accounts");
         }
         return accounts;
     }
@@ -97,7 +97,7 @@ public class AccountDAO implements MAINDAO<Account> {
                 }
             }
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while finding account with username: " + username);
+            handleSQLException(e, sql, "Error: unable to find account with username: " + username);
         }
         return Optional.empty();
     }
@@ -122,7 +122,7 @@ public class AccountDAO implements MAINDAO<Account> {
                 }
             }
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while validating login for username: " + username);
+            handleSQLException(e, sql, "Error: unable to validate login for username: " + username);
         }
         return Optional.empty();
     }
@@ -138,10 +138,10 @@ public class AccountDAO implements MAINDAO<Account> {
                     return rs.getInt(1) > 0;
                 }
             } catch (SQLException e) {
-                handleSQLException(e, sql, "Error while checking if username exists: " + username);
+                handleSQLException(e, sql, "Error: unable to check the existence of username: " + username);
             }
         } catch (SQLException e) {
-            handleSQLException(e, sql, "Error while establishing connection");
+            handleSQLException(e, sql, "Error: unable to establish connection");
         }
         return false;
     }
@@ -161,7 +161,7 @@ public class AccountDAO implements MAINDAO<Account> {
                     int generatedAccountId = generatedKeys.getInt(1);
                     return new Account(generatedAccountId, account.getUsername(), account.getPassword());
                 } else {
-                    throw new ExceptionDAO("Creating account failed, no ID obtained.");
+                    throw new ExceptionDAO("Account Creation Failed: unable to obtain ID.");
                 }
             }
         } catch (SQLException e) {
@@ -187,7 +187,7 @@ public class AccountDAO implements MAINDAO<Account> {
             if (affectedRows > 0) {
                 return true;
             } else {
-                throw new ExceptionDAO("Updating account failed, no such account found.");
+                throw new ExceptionDAO("Updating account failed, Account does not exist.");
             }
         } catch (SQLException e) {
             throw new ExceptionDAO("Updating account failed due to SQL error", e);
