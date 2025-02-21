@@ -123,33 +123,33 @@ public class MessageDAO implements MAINDAO<Message> {
     @Override
     public boolean update(Message message) {
         String sql = "UPDATE message SET posted_by = ?, message_text = ?, time_posted_epoch = ? WHERE message_id = ?";
-        int rowsUpdated = 0;
+        int noRowsUpdate = 0;
         Connection conn = ConnectionUtil.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, message.getPosted_by());
             ps.setString(2, message.getMessage_text());
             ps.setLong(3, message.getTime_posted_epoch());
             ps.setInt(4, message.getMessage_id());
-            rowsUpdated = ps.executeUpdate();
+            noRowsUpdate = ps.executeUpdate();
         } catch (SQLException e) {
             handleSQLException(e, sql, "Error : Unable to update the message with id: " + message.getMessage_id());
         }
-        return rowsUpdated > 0;
+        return noRowsUpdate > 0;
     }
 
     
     @Override
     public boolean delete(Message message) {
         String sql = "DELETE FROM message WHERE message_id = ?";
-        int rowsUpdated = 0;
+        int rowU = 0;
         Connection conn = ConnectionUtil.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, message.getMessage_id());
-            rowsUpdated = ps.executeUpdate();
+            rowU = ps.executeUpdate();
         } catch (SQLException e) {
             handleSQLException(e, sql, "Error: Unable to delete message with id: " + message.getMessage_id());
         }
-        return rowsUpdated > 0;
+        return rowU > 0;
     }
 
     

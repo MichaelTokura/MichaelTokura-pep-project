@@ -16,7 +16,7 @@ import io.javalin.http.NotFoundResponse;
 
 public class MessageService {
     private MessageDAO messageDao;
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageService.class);
+    private static final Logger serviceLogger = LoggerFactory.getLogger(MessageService.class);
     private static final String DB_ACCESS_ERROR_MSG = "Error: unable to access database";
 
     public MessageService() {
@@ -30,13 +30,13 @@ public class MessageService {
 
     
     public Optional<Message> getMessageById(int id) {
-        LOGGER.info("Searching for message with ID: {} ", id);
+        serviceLogger.info("Searching for message with ID: {} ", id);
         try {
             Optional<Message> message = messageDao.getById(id);
             if (!message.isPresent()) {
                 throw new ExceptionService("Unable to find message");
             }
-            LOGGER.info("Obtained message: {}", message.orElse(null));
+            serviceLogger.info("Obtained message: {}", message.orElse(null));
             return message;
         } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
@@ -45,10 +45,10 @@ public class MessageService {
 
    
     public List<Message> getAllMessages() {
-        LOGGER.info("Locating all messages");
+        serviceLogger.info("Locating all messages");
         try {
             List<Message> messages = messageDao.getAll();
-            LOGGER.info("Fetched {} messages", messages.size());
+            serviceLogger.info("Fetched {} messages", messages.size());
             return messages;
         } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
@@ -57,10 +57,10 @@ public class MessageService {
 
    
     public List<Message> getMessagesByAccountId(int accountId) {
-        LOGGER.info("Obtaining messages posted by AccountID: {}", accountId);
+        serviceLogger.info("Obtaining messages posted by AccountID: {}", accountId);
         try {
             List<Message> messages = messageDao.getMessagesByAccountId(accountId);
-            LOGGER.info("Fetched {} messages", messages.size());
+            serviceLogger.info("Fetched {} messages", messages.size());
             return messages;
         } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
@@ -69,7 +69,7 @@ public class MessageService {
 
     
     public Message createMessage(Message message, Optional<Account> account) {
-        LOGGER.info("Creating message: {}", message);
+        serviceLogger.info("Creating message: {}", message);
 
         if (!account.isPresent()) {
             throw new ExceptionService("Unable to post message without an account");
@@ -80,7 +80,7 @@ public class MessageService {
         checkAccountPermission(account.get(), message.getPosted_by());
         try {
             Message createdMessage = messageDao.insert(message);
-            LOGGER.info("Message successfully created: {}", createdMessage);
+            serviceLogger.info("Message successfully created: {}", createdMessage);
             return createdMessage;
         } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
@@ -89,7 +89,7 @@ public class MessageService {
 
     
     public Message updateMessage(Message message) {
-        LOGGER.info("Updating message: {}", message.getMessage_id());
+        serviceLogger.info("Updating message: {}", message.getMessage_id());
 
         Optional<Message> retrievedMessage = this.getMessageById(message.getMessage_id());
 
@@ -103,7 +103,7 @@ public class MessageService {
 
         try {
             messageDao.update(retrievedMessage.get());
-            LOGGER.info("Updated message: {}", message);
+            serviceLogger.info("Updated message: {}", message);
             return retrievedMessage.get();
         } catch (ExceptionDAO e) {
             throw new ExceptionService(DB_ACCESS_ERROR_MSG, e);
@@ -112,11 +112,11 @@ public class MessageService {
 
     
     public void deleteMessage(Message message) {
-        LOGGER.info("Deleting message: {}", message);
+        serviceLogger.info("Deleting message: {}", message);
         try {
             boolean hasDeletedMessage = messageDao.delete(message);
             if (hasDeletedMessage) {
-                LOGGER.info("Deleted message {}", message);
+                serviceLogger.info("Deleted message {}", message);
             } else {
                 throw new NotFoundResponse("Unable to find Message to delete");
             }
@@ -127,7 +127,7 @@ public class MessageService {
 
     
     private void validateMessage(Message message) {
-        LOGGER.info("Validating message: {}", message);
+        serviceLogger.info("Validating message: {}", message);
         if (message.getMessage_text() == null || message.getMessage_text().trim().isEmpty()) {
             throw new ExceptionService("Message text cannot be null or empty");
         }
@@ -138,7 +138,7 @@ public class MessageService {
 
     
     private void checkAccountPermission(Account account, int postedBy) {
-        LOGGER.info("Checking account permissions for messages");
+        serviceLogger.info("Checking account permissions for messages");
         if (account.getAccount_id() != postedBy) {
             throw new ExceptionService("Message cant be modified due to lack of account Authorization");
         }

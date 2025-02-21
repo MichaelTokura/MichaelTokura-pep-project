@@ -41,15 +41,15 @@ public class AccountDAO implements MAINDAO<Account> {
 
         String sql = "SELECT * FROM account WHERE account_id = ?";
         Connection conn = ConnectionUtil.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+        try (PreparedStatement state = conn.prepareStatement(sql)) {
+            state.setInt(1, id);
             
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
+            try (ResultSet result = state.executeQuery()) {
+                if (result.next()) {
                     return Optional.of(new Account(
-                            rs.getInt("account_id"),
-                            rs.getString("username"),
-                            rs.getString("password")));
+                        result.getInt("account_id"),
+                        result.getString("username"),
+                        result.getString("password")));
                 }
             }
         } catch (SQLException e) {
@@ -63,14 +63,14 @@ public class AccountDAO implements MAINDAO<Account> {
     public List<Account> getAll() {
         List<Account> accounts = new ArrayList<>();
         String sql = "SELECT * FROM account";
-        Connection conn = ConnectionUtil.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
+        Connection co = ConnectionUtil.getConnection();
+        try (PreparedStatement ps = co.prepareStatement(sql)) {
+            try (ResultSet resultset = ps.executeQuery()) {
+                while (resultset.next()) {
                     Account account = new Account(
-                            rs.getInt("account_id"),
-                            rs.getString("username"),
-                            rs.getString("password"));
+                        resultset.getInt("account_id"),
+                        resultset.getString("username"),
+                        resultset.getString("password"));
                     accounts.add(account);
                 }
             }
@@ -107,9 +107,9 @@ public class AccountDAO implements MAINDAO<Account> {
         String sql = "SELECT * FROM account WHERE username = ?";
         Connection conn = ConnectionUtil.getConnection();
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, username);
-            try (ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement prep = conn.prepareStatement(sql)) {
+            prep.setString(1, username);
+            try (ResultSet rs = prep.executeQuery()) {
                 if (rs.next()) {
                     Account account = new Account(
                             rs.getInt("account_id"),
@@ -178,13 +178,13 @@ public class AccountDAO implements MAINDAO<Account> {
     @Override
     public boolean update(Account account) {
         String sql = "UPDATE account SET username = ?, password = ? WHERE account_id = ?";
-        Connection conn = ConnectionUtil.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, account.getUsername());
-            ps.setString(2, account.getPassword());
-            ps.setInt(3, account.getAccount_id());
-            int affectedRows = ps.executeUpdate();
-            if (affectedRows > 0) {
+        Connection connect = ConnectionUtil.getConnection();
+        try (PreparedStatement pStatement = connect.prepareStatement(sql)) {
+            pStatement.setString(1, account.getUsername());
+            pStatement.setString(2, account.getPassword());
+            pStatement.setInt(3, account.getAccount_id());
+            int impact = pStatement.executeUpdate();
+            if (impact > 0) {
                 return true;
             } else {
                 throw new ExceptionDAO("Updating account failed, Account does not exist.");

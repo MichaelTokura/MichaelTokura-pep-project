@@ -14,7 +14,7 @@ import Model.Account;
 
 public class AccountService {
     private AccountDAO accountDao;
-    private static final Logger LOGGER = LoggerFactory.getLogger(AccountService.class);
+    private static final Logger accountLogger = LoggerFactory.getLogger(AccountService.class);
 
     public AccountService() {
         accountDao = new AccountDAO();
@@ -30,10 +30,10 @@ public class AccountService {
 
      
     public Optional<Account> getAccountById(int id) {
-        LOGGER.info("Fetching account with ID: {}", id);
+        accountLogger.info("Fetching account with ID: {}", id);
         try {
             Optional<Account> account = accountDao.getById(id);
-            LOGGER.info("Fetched account: {}", account.orElse(null));
+            accountLogger.info("Fetched account: {}", account.orElse(null));
             return account;
         } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while attempting to retrieve account", e);
@@ -43,10 +43,10 @@ public class AccountService {
    
 
     public List<Account> getAllAccounts() {
-        LOGGER.info("Fetching all accounts");
+        accountLogger.info("Fetching all accounts");
         try {
             List<Account> accounts = accountDao.getAll();
-            LOGGER.info("Fetched {} accounts", accounts.size());
+            accountLogger.info("Fetched {} accounts", accounts.size());
             return accounts;
         } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while attempting to retrieve accounts", e);
@@ -55,10 +55,10 @@ public class AccountService {
 
    
     public Optional<Account> findAccountByUsername(String username) {
-        LOGGER.info("Finding account by username: {}", username);
+        accountLogger.info("Finding account by username: {}", username);
         try {
             Optional<Account> account = accountDao.findAccountByUsername(username);
-            LOGGER.info("Found account: {}", account.orElse(null));
+            accountLogger.info("Found account: {}", account.orElse(null));
             return account;
         } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while finding account by username " + username, e);
@@ -67,11 +67,11 @@ public class AccountService {
 
     
     public Optional<Account> validateLogin(Account account) {
-        LOGGER.info("Validating login");
+        accountLogger.info("Validating login");
         try {
             Optional<Account> validatedAccount = accountDao.validateLogin(account.getUsername(),
                     account.getPassword());
-            LOGGER.info("Login validation result: {}", validatedAccount.isPresent());
+                    accountLogger.info("Login validation result: {}", validatedAccount.isPresent());
             return validatedAccount;
         } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while validating login", e);
@@ -80,7 +80,7 @@ public class AccountService {
 
     
     public Account createAccount(Account account) {
-        LOGGER.info("Creating account: {}", account);
+        accountLogger.info("Creating account: {}", account);
         try {
             validateAccount(account);
             Optional<Account> searchedAccount = findAccountByUsername(account.getUsername());
@@ -88,7 +88,7 @@ public class AccountService {
                 throw new ExceptionService("Account already exist");
             }
             Account createdAccount = accountDao.insert(account);
-            LOGGER.info("Created account: {}", createdAccount);
+            accountLogger.info("Created account: {}", createdAccount);
             return createdAccount;
         } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while creating account", e);
@@ -97,11 +97,11 @@ public class AccountService {
 
     
     public boolean updateAccount(Account account) {
-        LOGGER.info("Updating account: {}", account);
+        accountLogger.info("Updating account: {}", account);
         try {
             account.setPassword(account.password);
             boolean updated = accountDao.update(account);
-            LOGGER.info("Updated account: {}. Update successful {}", account, updated);
+            accountLogger.info("Updated account: {}. Update successful {}", account, updated);
             return updated;
         } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while while updating account", e);
@@ -110,13 +110,13 @@ public class AccountService {
 
     
     public boolean deleteAccount(Account account) {
-        LOGGER.info("Deleting account: {}", account);
+        accountLogger.info("Deleting account: {}", account);
         if (account.getAccount_id() == 0) {
             throw new IllegalArgumentException("Account ID cannot be null");
         }
         try {
             boolean deleted = accountDao.delete(account);
-            LOGGER.info("Deleted account: {} . Deletion successful {}", account, deleted);
+            accountLogger.info("Deleted account: {} . Deletion successful {}", account, deleted);
             return deleted;
         } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while while deleting account", e);
@@ -125,7 +125,7 @@ public class AccountService {
 
 
     private void validateAccount(Account account) {
-        LOGGER.info("Validating account: {}", account);
+        accountLogger.info("Validating account: {}", account);
         try {
 
             String username = account.getUsername().trim();
@@ -151,11 +151,11 @@ public class AccountService {
 
 
     public boolean accountExists(int accountId) {
-        LOGGER.info("Checking account existence with ID: {}", accountId);
+        accountLogger.info("Checking account existence with ID: {}", accountId);
         try {
             Optional<Account> account = accountDao.getById(accountId);
             boolean exists = account.isPresent();
-            LOGGER.info("Account existence: {}", exists);
+            accountLogger.info("Account existence: {}", exists);
             return exists;
         } catch (ExceptionDAO e) {
             throw new ExceptionService("Exception occurred while checking account existence", e);
